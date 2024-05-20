@@ -3,6 +3,9 @@ name: Backend Tests
 on:
   workflow_call:
     inputs:
+      image:
+        type: string
+        required: true
       command:
         type: string
         required: true
@@ -12,7 +15,7 @@ jobs:
     name: Backend
     runs-on: ubuntu-20.04
     container:
-      image: gmmcal/gmmcal:test
+      image: ${{ inputs.image }}
       env:
         DATABASE_URL: postgres://postgres:postgres@postgres:5432/gmmcalcombr_test
         DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL: true

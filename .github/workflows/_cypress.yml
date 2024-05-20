@@ -3,6 +3,12 @@ name: End-to-end Tests
 on:
   workflow_call:
     inputs:
+      image:
+        type: string
+        required: true
+      application-image:
+        type: string
+        required: true
       pattern:
         type: string
         required: true
@@ -15,7 +21,7 @@ jobs:
     name: "End-to-end - ${{ inputs.name }} (${{ matrix.browser }})"
     runs-on: ubuntu-20.04
     container:
-      image: gmmcal/gmmcal:cypress
+      image: ${{ inputs.image }}
       env:
         CYPRESS_BASE_URL: http://web:3000
         CYPRESS_SPEC_PATTERN: ${{ inputs.pattern }}
@@ -36,7 +42,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
       web:
-        image: gmmcal/gmmcal:test
+        image: ${{ inputs.application-image }}
         env:
           DATABASE_URL: postgres://postgres:postgres@postgres:5432/gmmcalcombr_test
           ON_CYPRESS: true

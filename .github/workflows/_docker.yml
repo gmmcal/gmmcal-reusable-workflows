@@ -6,10 +6,9 @@ on:
       name:
         type: string
         required: true
-      tag-name:
+      image:
         type: string
-        required: false
-        default: "gmmcal/gmmcal:test"
+        required: true
       target:
         type: string
         required: false
@@ -48,6 +47,6 @@ jobs:
           push: ${{ inputs.publish }}
           context: .
           target: ${{ inputs.target }}
-          tags: ${{ inputs.tag-name }}
-          cache-from: type=registry,ref=gmmcal/gmmcal:buildcache${{ inputs.target }}
-          cache-to: type=registry,ref=gmmcal/gmmcal:buildcache${{ inputs.target }},mode=max
+          tags: ${{ inputs.image }}
+          cache-from: type=registry,ref=gmmcal/${{ github.event.repository.name }}:${{ inputs.target }}cache
+          cache-to: type=registry,ref=gmmcal/${{ github.event.repository.name }}:${{ inputs.target }}cache,mode=max
