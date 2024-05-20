@@ -3,16 +3,15 @@ name: Lint
 on:
   workflow_call:
     inputs:
+      image:
+        type: string
+        required: true
       name:
         type: string
         required: true
       command:
         type: string
         required: true
-      image:
-        type: string
-        required: false
-        default: gmmcal/gmmcal:test
 
 jobs:
   lint:
