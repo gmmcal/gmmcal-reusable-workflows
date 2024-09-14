@@ -3,6 +3,10 @@ name: Release
 on:
   workflow_call:
     inputs:
+      reference:
+        type: string
+        required: false
+        default: main
       tag:
         type: string
         required: true
@@ -16,6 +20,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.reference }}
 
       - name: Create release
         uses: ncipollo/release-action@v1
