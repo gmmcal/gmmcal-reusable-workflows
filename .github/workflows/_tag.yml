@@ -27,7 +27,7 @@ jobs:
         with:
           token: ${{ github.token }}
           noVersionBumpBehavior: patch
-          branch: main
+          branch: ${{ inputs.reference }}
           majorList: "BREAK"
           minorList: "NEW"
           patchList: "FIX,OPT"
