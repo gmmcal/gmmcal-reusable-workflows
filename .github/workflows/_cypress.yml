@@ -19,7 +19,7 @@ on:
 jobs:
   e2e:
     name: "End-to-end - ${{ inputs.name }} (${{ matrix.browser }})"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     container:
       image: ${{ inputs.image }}
       env:
