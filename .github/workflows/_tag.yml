@@ -15,7 +15,7 @@ on:
 jobs:
   tag:
     name: Determine tag number
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       version: ${{ steps.semver.outputs.next }}
       branch: ${{ inputs.reference }}
