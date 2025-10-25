@@ -40,7 +40,7 @@ jobs:
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'tags/${{ steps.semver.outputs.nextMajor }}',
+              ref: 'refs/tags/${{ steps.semver.outputs.nextMajor }}',
               sha: context.payload.after
             }).catch(err => {
               if (err.status !== 422) throw err;
