@@ -3,6 +3,10 @@ name: Dependabot
 on:
   - pull_request
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   run:
     uses: gmmcal/gmmcal-reusable-workflows/.github/workflows/_dependabot.yml@v1
