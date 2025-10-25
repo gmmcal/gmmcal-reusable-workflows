@@ -1,4 +1,4 @@
-name: Deploy application
+name: Deploy preview environment
 
 on:
   workflow_call:
@@ -10,9 +10,6 @@ on:
         type: string
         required: true
       url:
-        type: string
-        required: true
-      tag:
         type: string
         required: true
       ruby-version:
@@ -45,12 +42,10 @@ jobs:
       group: release
     environment:
       name: ${{ inputs.environment }}
-      url: ${{ inputs.url }}
+      url: https://pr${{ github.event.number }}.gustavocunha.dev
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
-        with:
-          ref: ${{ inputs.tag }}
 
       - name: Set up Docker Buildx
         id: buildx
@@ -73,8 +68,19 @@ jobs:
           ruby-version: ${{ inputs.ruby-version }}
           bundler-cache: true
 
+      - uses: jdx/mise-action@v3
+        with:
+          mise_toml: |
+            [tools]
+            ytt = "latest"
+
+      - name: Template file
+        run: |
+          ytt -f config/deploy.template.yml --data-value host=pr${{ github.event.number }}.gustavocunha.dev --data-value database=gmmcal_pr${{ github.event.number }} > config/deploy.pr${{ github.event.number }}.yml
+          cp .kamal/secrets .kamal/secrets.pr${{ github.event.number }}
+
       - name: Deploy command
-        run: bundle exec kamal deploy --version=${{ inputs.tag }}
+        run: bundle exec kamal deploy -d pr${{ github.event.number }}
         env:
           KAMAL_REGISTRY_PASSWORD: ${{ secrets.dockerhub-token }}
           RAILS_MASTER_KEY: ${{ secrets.rails-master-key }}
