@@ -12,23 +12,82 @@ on:
       url:
         type: string
         required: true
+      tag:
+        type: string
+        required: true
       params:
         type: string
         required: false
         default: ""
+      ruby-version:
+        type: string
+        required: false
+        default: "3.4"
+    secrets:
+      dockerhub-username:
+        required: true
+      dockerhub-token:
+        required: true
+      ssh-private-key:
+        required: true
+      rails-master-key:
+        required: true
+      database-host:
+        required: true
+      postgres-user:
+        required: true
+      postgres-password:
+        required: true
+      postgres-db:
+        required: true
 
 jobs:
   deploy:
     name: ${{ inputs.name }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    concurrency:
+      group: release
     environment:
       name: ${{ inputs.environment }}
       url: ${{ inputs.url }}
-
     steps:
-      - name: Deploy
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.dockerhub-username }}
+          password: ${{ secrets.dockerhub-token }}
+
+      - uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.ssh-private-key }}
+          log-public-key: false
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ inputs.ruby-version }}
+
+      - name: Install Kamal
+        run: gem install kamal -v 2.7.0 # lock version because of kamal proxy. Maybe consider adding kamal as a project dependency on a deploy group that will be installed on this action
+
+      - name: Deploy command
+        run: kamal deploy --version=${{ inputs.tag }}
         env:
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-          DEPLOY_SERVICE: ${{ secrets.DEPLOY_SERVICE }}
-        run: |
-          curl "https://api.render.com/deploy/srv-$DEPLOY_SERVICE?key=$DEPLOY_KEY&${{ inputs.params }}"
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.dockerhub-token }}
+          RAILS_MASTER_KEY: ${{ secrets.rails-master-key }}
+          DATABASE_HOST: ${{ secrets.database-host }}
+          DATABASE_USERNAME: ${{ secrets.postgres-user }}
+          DATABASE_PASSWORD: ${{ secrets.postgres-password }}
+          # db setup
+          POSTGRES_DB: ${{ secrets.postgres-db }}
+          POSTGRES_USER: ${{ secrets.postgres-user }}
+          POSTGRES_PASSWORD: ${{ secrets.postgres-password }}
