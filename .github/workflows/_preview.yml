@@ -38,8 +38,6 @@ jobs:
   deploy:
     name: ${{ inputs.name }}
     runs-on: ubuntu-latest
-    concurrency:
-      group: release
     environment:
       name: ${{ inputs.environment }}
       url: https://pr${{ github.event.number }}.gustavocunha.dev
