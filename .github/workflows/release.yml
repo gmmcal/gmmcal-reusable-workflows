@@ -23,7 +23,7 @@ jobs:
           patchList: "FIX,OPT"
 
       - name: 🏷️ Create tag ${{ steps.semver.outputs.next }}
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             github.rest.git.createRef({
@@ -34,7 +34,7 @@ jobs:
             })
 
       - name: 🏷️ Create/update tag ${{ steps.semver.outputs.nextMajor }}
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             github.rest.git.createRef({
