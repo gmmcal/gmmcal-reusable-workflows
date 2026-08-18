@@ -8,6 +8,8 @@ updates:
   - package-ecosystem: github-actions
     directory: "/"
     open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "OPT"
     schedule:
