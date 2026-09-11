@@ -51,5 +51,5 @@ jobs:
 
     steps:
       - name: Run tests on ${{ matrix.browser }}
-        run: cypress run --browser ${{ matrix.browser }}
+        run: yarn cypress run --browser ${{ matrix.browser }}
         working-directory: /rails
