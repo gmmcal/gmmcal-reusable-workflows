@@ -40,7 +40,7 @@ on:
 jobs:
   deploy:
     name: ${{ inputs.name }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     concurrency:
       group: release
     environment:
