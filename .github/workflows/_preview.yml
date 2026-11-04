@@ -37,7 +37,7 @@ on:
 jobs:
   deploy:
     name: ${{ inputs.name }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     environment:
       name: ${{ inputs.environment }}
       url: https://pr${{ github.event.number }}.gustavocunha.dev
