@@ -3,9 +3,6 @@ name: End-to-end Tests
 on:
   workflow_call:
     inputs:
-      image:
-        type: string
-        required: true
       application-image:
         type: string
         required: true
@@ -15,16 +12,21 @@ on:
       name:
         type: string
         required: true
+      node-version:
+        type: string
+        required: false
+        default: "24"
+      database-name:
+        type: string
+        required: true
 
 jobs:
   e2e:
     name: "End-to-end - ${{ inputs.name }} (${{ matrix.browser }})"
     runs-on: ubuntu-26.04
-    container:
-      image: ${{ inputs.image }}
-      env:
-        CYPRESS_BASE_URL: http://web:3000
-        CYPRESS_SPEC_PATTERN: ${{ inputs.pattern }}
+    env:
+      CYPRESS_BASE_URL: http://localhost:3000
+      CYPRESS_SPEC_PATTERN: ${{ inputs.pattern }}
 
     strategy:
       matrix:
@@ -34,9 +36,9 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: gmmcalcombr_test
+          POSTGRES_USER: database-name
+          POSTGRES_PASSWORD: database-password
+          POSTGRES_DB: ${{ inputs.database-name }}
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -44,12 +46,36 @@ jobs:
       web:
         image: ${{ inputs.application-image }}
         env:
-          DATABASE_URL: postgres://postgres:postgres@postgres:5432/gmmcalcombr_test
+          DATABASE_URL: postgres://database-name:database-password@postgres:5432/${{ inputs.database-name }}
           ON_CYPRESS: true
         ports:
           - 3000:3000
+        options: --health-cmd "curl http://localhost:3000/up" --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
+      - name: docker network
+        run: docker container ls
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install Node dependencies
+        run: |
+          npm install -g corepack
+          corepack enable
+          yarn set version 4.15.0
+          yarn install
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: "yarn"
+
       - name: Run tests on ${{ matrix.browser }}
         run: yarn cypress run --browser ${{ matrix.browser }}
-        working-directory: /rails

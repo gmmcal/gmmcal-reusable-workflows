@@ -3,9 +3,18 @@ name: Lint
 on:
   workflow_call:
     inputs:
-      image:
+      ruby-version:
         type: string
-        required: true
+        required: false
+        default: "3.4"
+      node-version:
+        type: string
+        required: false
+        default: "24"
+      run-node:
+        type: boolean
+        required: false
+        default: false
       name:
         type: string
         required: true
@@ -17,11 +26,38 @@ jobs:
   lint:
     name: ${{ inputs.name }}
     runs-on: ubuntu-26.04
-    container:
-      image: ${{ inputs.image }}
-      options: "--user=root:root"
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        if: ${{ !inputs.run-node }}
+        with:
+          ruby-version: ${{ inputs.ruby-version }}
+          bundler-cache: true
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        if: ${{ inputs.run-node }}
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install Node dependencies
+        if: ${{ inputs.run-node }}
+        run: |
+          npm install -g corepack
+          corepack enable
+          yarn set version 4.15.0
+          yarn install
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        if: ${{ inputs.run-node }}
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: "yarn"
+
       - name: Execute ${{ inputs.command }}
         run: ${{ inputs.command }}
-        working-directory: /rails
