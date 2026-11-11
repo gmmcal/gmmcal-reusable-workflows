@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Get Next Version
         id: semver
-        uses: ietf-tools/semver-action@v1
+        uses: ietf-tools/semver-action@v1.12.0
         with:
           token: ${{ github.token }}
           branch: main
@@ -28,7 +28,7 @@ jobs:
           patchList: "FIX,OPT"
 
       - name: 🏷️ Create tag ${{ steps.semver.outputs.next }}
-        uses: actions/github-script@v9
+        uses: actions/github-script@v9.0.0
         with:
           script: |
             github.rest.git.createRef({
@@ -39,7 +39,7 @@ jobs:
             })
 
       - name: 🏷️ Create/update tag ${{ steps.semver.outputs.nextMajor }}
-        uses: actions/github-script@v9
+        uses: actions/github-script@v9.0.0
         with:
           script: |
             github.rest.git.createRef({
