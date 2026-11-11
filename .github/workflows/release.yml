@@ -5,12 +5,17 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   tag:
     runs-on: ubuntu-26.04
     permissions:
       contents: write
-
+    outputs:
+      version: ${{ steps.semver.outputs.next }}
+      major: ${{ steps.semver.outputs.nextMajor }}
     steps:
       - name: Get Next Version
         id: semver
@@ -51,3 +56,12 @@ jobs:
                 sha: context.payload.after
               });
             })
+
+  release:
+    name: Release
+    uses: gmmcal/gmmcal-reusable-workflows/.github/workflows/_release.yml@v1
+    needs:
+      - tag
+    with:
+      tag: ${{ needs.tag.outputs.version }}
+      reference: ${{ github.sha }}
