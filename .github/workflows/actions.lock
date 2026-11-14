@@ -27,7 +27,7 @@ workflows:
         - 'actions/checkout@v7.0.1'
         - 'docker/login-action@v4.7.0'
         - 'docker/setup-buildx-action@v4.4.1'
-        - 'jdx/mise-action@v5.2.6'
+        - 'jdx/mise-action@v5.2.7'
         - 'ruby/setup-ruby@v1.338.0'
         - 'webfactory/ssh-agent@v0.10.0'
     '.github/workflows/_release.yml':
@@ -90,9 +90,9 @@ dependencies:
         commit: 'sha1-46feaa27e7375da0e3d602721e9fb9573598b880'
         owner_id: 49498074
         repo_id: 459802181
-    'jdx/mise-action@v5.2.6':
-        ref: 'v5.2.6'
-        commit: 'sha1-f5be966e4a917d54244728e6a5fdcd1d93a35e6c'
+    'jdx/mise-action@v5.2.7':
+        ref: 'v5.2.7'
+        commit: 'sha1-b44d12e7d0d8ee7461bb893e1b1993500433185b'
         owner_id: 216188
         repo_id: 738284564
     'ncipollo/release-action@v1.21.0':
